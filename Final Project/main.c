@@ -7,11 +7,15 @@
  * 11/12/17: Made skeleton for cliff sensors and putty commands
  * 11/13/17: Manuel movement ready, and cliff detect not working properly
  * (Fine with hole, not with white tape)
+ * 11/28/17: Attempt to work on getting to endzone, finished with music and flashing LED.
+ *              There might be a way to find with using both ping and ir that are in agreement
  */
 
 #include "WiFi.h"
 #include "movement.h"
 #include "open_interface.h"
+#include "timer.h"
+#include "music.h"
 #include "UART.h"
 #include "sweep.h"
 #include "servo.h"
@@ -54,8 +58,9 @@ int main(void) {
 	       }
 	       /*int shortObject = shortResult();
 	       int shortAngle = shortLoc();
+	       int shortWidth = shortWid();
 	       char message3[100];
-	       sprintf(message3, "Short object at Angle %d  Distance  %d\n\r" ,shortAngle, shortObject);
+	       sprintf(message3, "Short object at Angle %d  Distance  %d  Width %d\n\r" ,shortAngle, shortObject, shortWidth);
 	       puts(message3);
 	       UART_TransmitMessage(message3);*/
 	       //Putty will tells us what to do next and use one of the commands belong to excute
@@ -133,9 +138,32 @@ int main(void) {
 	       if(command == 'd'){
 	           turn_clockwise(sensor_data, -89);
 	           }
+	       if(command == 'q'){
+
+	       }
+	       if(command == 'e'){
+
+	       }
+	       if(command == 'l'){
+	           load_songs();
+	           oi_setLeds(1, 1, 0, 255);
+	           timer_waitMillis(100);
+	           oi_setLeds(0, 0, 0, 0);
+	           timer_waitMillis(100);
+	           oi_setLeds(1, 1, 0, 255);
+	           timer_waitMillis(100);
+	           oi_setLeds(0, 0, 0, 0);
+	           timer_waitMillis(100);
+	           oi_setLeds(1, 1, 0, 255);
+	           timer_waitMillis(100);
+	           oi_setLeds(0, 0, 0, 0);
+	           timer_waitMillis(100);
+	           oi_setLeds(1, 1, 0, 255);
+	       }
 
 	       //Reset doneSweep to 0 and sweeps again
 	       doneSweep = 0;
+
 	   }
       }
 	return 0;

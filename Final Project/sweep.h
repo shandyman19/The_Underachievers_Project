@@ -14,4 +14,9 @@ int distResults(int value);
 
 int posResults(int value);
 
+int shortResult();
+
+int shortLoc();
+
+int shortWid();
 #endif /* SWEEP_H_ */

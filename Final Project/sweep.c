@@ -20,6 +20,9 @@
 
 char objectLoc[91];
 char objectDist[91];
+int shortObject = 0;
+int shortAngle = 0;
+int smallWidth = 0;
 
 int sweep(void)
 {
@@ -33,7 +36,6 @@ int sweep(void)
     UART_Init();
     char irDist[91];
     char pingDist[91];
-    //int objectLoc[91];
     int angle = 0;
     //int indexCount = 0;
     //int positionIndex = 0;
@@ -51,18 +53,22 @@ int sweep(void)
         int degree = 0;
         int startPos = 0;
         int lastPos = 0;
+       // int startShortPos = 0;
+       // int lastShortPos = 0;
         int indexSize = 0;
-        int objectLength [91];
+       // int objectLength [91];
         int indexCount = 0;
         int positionIndex = 0;
+       // int positionShort = 0;
         int smallIndex = 180;
         int firstFlag = 0;
-        //int secondFlag = 0;
+       // int shortFlag = 0;
         int smallIR = 0;
         int smallPing = 0;
         int smallAngle = 0;
         int smallObject = 0;
-        int smallWidth = 0;
+
+
         //int firstLength = 0;
         //int secondLength = 0;
 
@@ -92,6 +98,20 @@ int sweep(void)
             int pingCenti = timetodist(delta);
             pingDist[j] = pingCenti;
 
+            //checks to see if the short object is detected
+            /*if((pingCenti>=30)&&(pingCenti<=70)&&(shortFlag == 0)){
+                startShortPos = angle;
+                shortFlag++;
+
+            }
+            if((pingCenti<30)||(pingCenti>70)&&(shortFlag == 1)){
+                lastShortPos = angle;
+                shortFlag = 0;
+                shortObject = pingCenti;
+                shortAngle = (lastPos + startPos)/2;
+
+            }*/
+
             //Once an object is detected, records the first edge of object
             if((irCenti >= 5) && (irCenti <= 80) && (firstFlag == 0)){
              startPos = angle;
@@ -117,7 +137,7 @@ int sweep(void)
                      smallPing = pingDist[k]; //Smallest Ping sensor
                      smallAngle = positionIndex;//Angle of smallest object
                      smallObject = indexCount; //Current count is now the smallest index
-                     smallWidth = objectLength[n]; //Current width is now the smallest width
+                     //smallWidth = objectLength[n]; //Current width is now the smallest width
                  }
                  m++;
                  n++;
@@ -166,3 +186,12 @@ int distResults(int value){
 int posResults(int value){
     return objectLoc[value];
 }
+/*int shortResult(){
+    return shortObject;
+}
+int shortLoc(){
+    return shortAngle;
+}
+int shortWid(){
+    return smallWidth;
+}*/
