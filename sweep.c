@@ -121,14 +121,14 @@ int sweep(void)
             }*/
 
             //Once an object is detected, records the first edge of object
-            if((irCenti >= 5) && (irCenti <= 80) && (firstFlag == 0)){
+            if((irCenti >= 5) && (irCenti <= 70) && (pingCenti <= 100) && (firstFlag == 0)){
              startPos = angle;
              startPing = pingCenti;
              //firstLength = pingDist[j];
              firstFlag++;
             }
             //Will continue to read until it is out of range and records the last edge of object
-            if((irCenti < 5)||(irCenti > 80) && firstFlag == 1){
+            if((irCenti < 5)||(irCenti > 70) && (pingCenti > 100) && (firstFlag == 1)){
                  lastPos = angle;
                  lastPing = pingCenti;
                  //secondLength = pingDist[j];
@@ -168,7 +168,7 @@ int sweep(void)
             ++k;
             ++j;
             degree = 2;
-            //timer_waitMillis(100);
+            timer_waitMillis(100);
 
 
         }
