@@ -25,6 +25,8 @@ char smallObjectLoc[91];
 int shortObject = 0;
 int shortAngle = 0;
 int smallWidth = 0;
+int pingCenti1 = 0;
+double pi = 3.1415;
 
 int sweep(void)
 {
@@ -45,6 +47,7 @@ int sweep(void)
     //int firstFlag = 0;
     //int secondFlag = 0;
 
+
     while (1)
     {
         int i = 0;
@@ -63,7 +66,7 @@ int sweep(void)
         int indexCount = 0;
         int positionIndex = 0;
        // int positionShort = 0;
-        int smallIndex = 180;
+        //int smallIndex = 180;
         int firstFlag = 0;
        // int shortFlag = 0;
         int smallIR = 0;
@@ -74,7 +77,13 @@ int sweep(void)
         int lastPing = 0;
         int objectSize = 0;
         int smallCount = 0;
-        int count = 0;
+        //int count = 0;
+        memset(smallObjectAngle, 0, 91);
+        memset(smallObjectLoc, 0, 91);
+        memset(objectLoc, 0, 91);
+        memset(objectDist, 0, 91);
+        //memset(irDist, 0, 91);
+        //memset(pingDist, 0, 91);
 
 
         //int firstLength = 0;
@@ -104,6 +113,7 @@ int sweep(void)
             //Get ping distance at current angle
             int delta = ping_read();
             int pingCenti = timetodist(delta);
+            pingCenti1 = timetodist(delta);
             pingDist[j] = pingCenti;
 
             //checks to see if the short object is detected
@@ -128,7 +138,7 @@ int sweep(void)
              firstFlag++;
             }
             //Will continue to read until it is out of range and records the last edge of object
-            if((irCenti < 5)||(irCenti > 70) && (pingCenti > 100) && (firstFlag == 1)){
+            if((irCenti < 5)||(irCenti > 70) && (firstFlag == 1)){
                  lastPos = angle;
                  lastPing = pingCenti;
                  //secondLength = pingDist[j];
@@ -138,16 +148,16 @@ int sweep(void)
                  positionIndex = (lastPos + startPos)/2; //Angle of current index
                  //objectLength[n] = sqrt(pow(firstLength,2)+ pow(secondLength,2) - 2*firstLength*secondLength*cos(indexSize));
                  objectLoc[m] = positionIndex; //Stores current location into an array
-                 objectDist[m] =  pingDist[k]; //Stores current ping value to current object
+                 objectDist[m] =  pingDist[k-1]; //Stores current ping value to current object
 
                  //object size calc
-                 objectSize = startPing*sin(indexSize/2) + lastPing*sin(indexSize/2);
+                 objectSize = startPing*sin(indexSize/2 * (pi/180)) + lastPing*sin(indexSize/2 * (pi/180));
 
 
-                 //Check if the object size is smaller than the smallest object
-                 if(objectSize < 16){
+                 //Check if the object size is the size of a skinny object
+                 if(objectSize < 12){
                          smallObjectAngle[p] = positionIndex;//Angle of smallest object
-                         smallObjectLoc[p] = pingDist[k]; //Current locatation of small object
+                         smallObjectLoc[p] = pingDist[k-1]; //Current locatation of small object
                          //smallObject = indexCount; //Current count is now the smallest index
                          smallCount++;
                          ++p;
@@ -162,8 +172,8 @@ int sweep(void)
                     pingDist[j]);
             puts(message);
             UART_TransmitMessage(message);
-            lcd_printf("Degree:%d\nIR:%d\nPing:%d", angle, irDist[k],
-                       pingDist[j]);
+            lcd_printf("Degree:%d\nIR:%d\nPing:%d\nPing2:%d", angle, irDist[k],
+                       pingDist[j], pingCenti);
             //Increase all increments for the arrays and change degree to 2
             ++k;
             ++j;
@@ -187,25 +197,28 @@ int sweep(void)
         //Prints Index number, degree, IR and Ping distance, then stops
         //lcd_printf("Index:%d\nDegree:%d\nIR:%d\nPing:%d",secondFlag,objectLoc[secondFlag],smallIR,smallPing);
         lcd_printf("Index:%d\nDegree:%d\nIR:%d\nPing:%d",smallObject,smallAngle,smallIR,smallPing);
+
         break;
     }
         return 1;
 }
 
-
+//Returns an object's distance at some value
 int distResults(int value){
     return objectDist[value];
 }
-
+//Returns an object's position/angle at some value
 int posResults(int value){
     return objectLoc[value];
 }
+//Returns an small object's distance at some value
 int smallPosResult(int value){
     return smallObjectLoc[value];
 }
+//Returns an small object's position/angle at some value
 int smallAngleResult(int value){
     return smallObjectAngle[value];
 }
-/*int shortWid(){
-    return smallWidth;
-}*/
+int getPing(){
+    return pingCenti1;
+}

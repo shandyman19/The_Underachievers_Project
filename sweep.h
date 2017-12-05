@@ -18,5 +18,5 @@ int smallPosResult(int value);
 
 int smallAngleResult(int value);
 
-//int shortWid();
+int getPing();
 #endif /* SWEEP_H_ */

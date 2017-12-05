@@ -29,7 +29,7 @@
 #include <math.h>
 
 int main(void) {
-	  //First we initalize our functions
+	  //First we initialize our functions
       lcd_init();
       //char password[] = "Cpre_288";
       //WiFi_start(password);
@@ -37,10 +37,10 @@ int main(void) {
       oi_init(sensor_data);
       //Use to tell code when our sweep is done
       int doneSweep;
-      char objectLoc[91];
-      char objectDist[91];
-      char smallObjectAngle[91];
-      char smallObjectLoc[91];
+      char objectLoc1[91];
+      char objectDist1[91];
+      char smallObjectAngle1[91];
+      char smallObjectLoc1[91];
       int count = 0;
       while(1){
           if(count == 0){
@@ -50,39 +50,36 @@ int main(void) {
           //Reads through each object's location and distance from bot and prints onto putty for us to see
           while(doneSweep == 1){
 	       for(i = 0; i < 91; i++){
-	           objectLoc[i] = posResults(i); //Gets object's location at that specific value
-	           objectDist[i] = distResults(i); //Gets object's distance at that specific value
-	           if(objectLoc[i] == 0 && objectDist[i] == 0){//Once all objects are printed out, break out of loop
+	           objectLoc1[i] = posResults(i); //Gets object's location at that specific value
+	           objectDist1[i] = distResults(i); //Gets object's distance at that specific value
+	           if(objectLoc1[i] == 0 && objectDist1[i] == 0){//Once all objects are printed out, break out of loop
 	               break;
 	           }
 	           char message2[100];
-	           sprintf(message2, "Object %d: Angle %d  Distance  %d\n\r" ,i+1, objectLoc[i], objectDist[i]);
+	           sprintf(message2, "Object %d: Angle %d  Distance  %d\n\r" ,i+1, objectLoc1[i], objectDist1[i]);
 	           puts(message2);
 	           UART_TransmitMessage(message2);
 	       }
+	       //Reads through each skinny object's location and distance from bot and prints onto putty for us to see
 	       for(i = 0; i < 91; ++i){
-	           smallObjectAngle[i] = smallAngleResult(i);
-	           smallObjectLoc[i] = smallPosResult(i);
-	           if(smallObjectAngle[i] == 0 && smallObjectLoc[i] == 0){
+	           smallObjectAngle1[i] = smallAngleResult(i);
+	           smallObjectLoc1[i] = smallPosResult(i);
+	           if(smallObjectAngle1[i] == 0 && smallObjectLoc1[i] == 0){
 	               break;
 	           }
 	           char message3[100];
-	           sprintf(message3, "Small Object %d: Angle %d  Distance  %d\n\r" ,i+1, smallObjectAngle[i], smallObjectLoc[i]);
+	           sprintf(message3, "Small Object %d: Angle %d  Distance  %d\n\r" ,i+1, smallObjectAngle1[i], smallObjectLoc1[i]);
 	           puts(message3);
 	           UART_TransmitMessage(message3);
 	       }
-	       //Resets Array to be empty
-	       memset(smallObjectAngle, 0, 91);
-	       memset(smallObjectLoc, 0, 91);
-	       memset(objectLoc, 0, 91);
-	       memset(objectDist, 0, 91);
 	       doneSweep = 0;
 	       count = 1;
           }
           }
 
 	       //Putty will tells us what to do next and use one of the commands belong to excute
-	       char message[100];
+	       int pingSome = getPing();
+           char message[100];
 	       sprintf(message, "What is your command? \n\r");
 	       puts(message);
 	       UART_TransmitMessage(message);
@@ -90,10 +87,9 @@ int main(void) {
 	       timer_waitMillis(500);
 
 	       //Moves bot, if cliff is detected, stop and turn
-
 	       if(command == 'w'){
 	           move_forward(sensor_data, 100);
-	           if((sensor_data->cliffLeft) || ((sensor_data->cliffLeftSignal) > 2790)){
+	           if(sensor_data->cliffLeft){
 	               oi_setWheels(0,0);
 	               char cliffMessage[100];
 	               sprintf(cliffMessage, "Cliff on left side! \n\r");
@@ -102,7 +98,63 @@ int main(void) {
 	               move_backwards(sensor_data, -100);
 
 	           }
-	           else if((sensor_data->cliffFrontLeft) || ((sensor_data->cliffFrontLeftSignal) > 2780)){
+	           else if((sensor_data->cliffLeftSignal) > 2790){
+	               oi_setWheels(0,0);
+	               char cliffMessage[100];
+	               sprintf(cliffMessage, "Cliff Tape on left side! \n\r");
+	               puts(cliffMessage);
+	               UART_TransmitMessage(cliffMessage);
+	               move_backwards(sensor_data, -100);
+	           }
+	           else if(sensor_data->cliffFrontLeft){
+	               oi_setWheels(0,0);
+	               char cliffMessage[100];
+	               sprintf(cliffMessage, "Cliff on front left side! \n\r");
+	               puts(cliffMessage);
+	               UART_TransmitMessage(cliffMessage);
+	               move_backwards(sensor_data, -100);
+	           }
+	           else if((sensor_data->cliffFrontLeftSignal) > 2780){
+	               oi_setWheels(0,0);
+	               char cliffMessage[100];
+	               sprintf(cliffMessage, "Cliff Tape on front left side! \n\r");
+	               puts(cliffMessage);
+	               UART_TransmitMessage(cliffMessage);
+	               move_backwards(sensor_data, -100);
+	           }
+	           else if(sensor_data->cliffFrontRight){
+	               oi_setWheels(0,0);
+	               char cliffMessage[100];
+	               sprintf(cliffMessage, "Cliff on front right side! \n\r");
+	               puts(cliffMessage);
+	               UART_TransmitMessage(cliffMessage);
+	               move_backwards(sensor_data, -100);
+	           }
+	           else if((sensor_data->cliffFrontRightSignal) > 2750){
+	               oi_setWheels(0,0);
+	               char cliffMessage[100];
+	               sprintf(cliffMessage, "Cliff Tape on front right side! \n\r");
+	               puts(cliffMessage);
+	               UART_TransmitMessage(cliffMessage);
+	               move_backwards(sensor_data, -100);
+	           }
+	           else if(sensor_data->cliffLeft){
+	               oi_setWheels(0,0);
+	               char cliffMessage[100];
+	               sprintf(cliffMessage, "Cliff on right side! \n\r");
+	               puts(cliffMessage);
+	               UART_TransmitMessage(cliffMessage);
+	               move_backwards(sensor_data, -100);
+	           }
+	           else if((sensor_data->cliffLeftSignal) > 2740){
+	           oi_setWheels(0,0);
+	           char cliffMessage[100];
+	           sprintf(cliffMessage, "Cliff Tape on right side! \n\r");
+	           puts(cliffMessage);
+	           UART_TransmitMessage(cliffMessage);
+	           move_backwards(sensor_data, -100);
+	           }
+	           /*else if((sensor_data->cliffFrontLeft) || ((sensor_data->cliffFrontLeftSignal) > 2780)){
 	               oi_setWheels(0,0);
 	               char cliffMessage[100];
 	               sprintf(cliffMessage, "Cliff on front left side! \n\r");
@@ -128,7 +180,7 @@ int main(void) {
 	               UART_TransmitMessage(cliffMessage);
 	               move_backwards(sensor_data, -100);
 
-	           }
+	           }*/
 	           else if(sensor_data->bumpLeft){
 	               oi_setWheels(0,0);
 	               char cliffMessage[100];
@@ -160,49 +212,46 @@ int main(void) {
 	       if(command == 'd'){
 	           turn_clockwise(sensor_data, -89);
 	           }
-	       //Left 45 degrees
+	       //Left 20 degrees
 	       if(command == 'q'){
-	           turn_counterclockwise(sensor_data, 47);
+	           turn_counterclockwise(sensor_data, 20);
 	       }
-	       //right 45 degrees
+	       //right 20 degrees
 	       if(command == 'e'){
-	           turn_clockwise(sensor_data, -37);
+	           turn_clockwise(sensor_data, -20);
 	       }
+	       //Sweeps again
 	       if(command =='r'){
 	           int i = 0;
 	           doneSweep = sweep();
 	           //Reads through each object's location and distance from bot and prints onto putty for us to see
 	           while(doneSweep == 1){
 	              for(i = 0; i < 91; i++){
-	                 objectLoc[i] = posResults(i); //Gets object's location at that specific value
-	                 objectDist[i] = distResults(i); //Gets object's distance at that specific value
-	                     if(objectLoc[i] == 0 && objectDist[i] == 0){//Once all objects are printed out, break out of loop
+	                 objectLoc1[i] = posResults(i); //Gets object's location at that specific value
+	                 objectDist1[i] = distResults(i); //Gets object's distance at that specific value
+	                     if(objectLoc1[i] == 0 && objectDist1[i] == 0){//Once all objects are printed out, break out of loop
 	                         break;
 	                         }
 	                 char message2[100];
-	                 sprintf(message2, "Object %d: Angle %d  Distance  %d\n\r" ,i+1, objectLoc[i], objectDist[i]);
+	                 sprintf(message2, "Object %d: Angle %d  Distance  %d\n\r" ,i+1, objectLoc1[i], objectDist1[i]);
 	                 puts(message2);
 	                 UART_TransmitMessage(message2);
 	                 }
 	              for(i = 0; i < 91; ++i){
-	                 smallObjectAngle[i] = smallAngleResult(i);
-	                 smallObjectLoc[i] = smallPosResult(i);
-	                     if(smallObjectAngle[i] == 0 && smallObjectLoc[i] == 0){
+	                 smallObjectAngle1[i] = smallAngleResult(i);
+	                 smallObjectLoc1[i] = smallPosResult(i);
+	                     if(smallObjectAngle1[i] == 0 && smallObjectLoc1[i] == 0){
 	                        break;
 	                        }
 	              char message3[100];
-	              sprintf(message3, "Small Object %d: Angle %d  Distance  %d\n\r" ,i+1, smallObjectAngle[i], smallObjectLoc[i]);
+	              sprintf(message3, "Small Object %d: Angle %d  Distance  %d\n\r" ,i+1, smallObjectAngle1[i], smallObjectLoc1[i]);
 	              puts(message3);
 	              UART_TransmitMessage(message3);
 	          }
-	          //Resets Array to be empty
-	          memset(smallObjectAngle, 0, 91);
-	          memset(smallObjectLoc, 0, 91);
-	          memset(objectLoc, 0, 91);
-	          memset(objectDist, 0, 91);
 	          doneSweep = 0;
 	          count = 1;
 	         }
+
 	       }
 	       //Once we are in the zone, plays music and flash leds and end bot movement and sweep
 	       if(command == 'l'){
@@ -221,6 +270,7 @@ int main(void) {
 	           timer_waitMillis(100);
 	           oi_setLeds(1, 1, 0, 255);
 	           count = 1;
+
 
 	       }
 	  }
